@@ -22,7 +22,7 @@ class AndroidDownloader(
             .setAllowedNetworkTypes(DownloadManager.Request.NETWORK_MOBILE)
             .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
             .setTitle("sportsbaazi.apk")
-            .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "/download/")
+            .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "sportsbaazi.apk")
         return downloadManager.enqueue(request)
     }
 }

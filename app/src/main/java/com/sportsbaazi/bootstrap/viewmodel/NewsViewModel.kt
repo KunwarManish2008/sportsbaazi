@@ -4,10 +4,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.gson.Gson
 import com.sportsbaazi.bootstrap.data.Result
 import com.sportsbaazi.bootstrap.data.repository.NewsRepository
 import com.sportsbaazi.bootstrap.data.response.NewsResponse
 import com.sportsbaazi.bootstrap.downloadmanager.AndroidDownloader
+import com.sportsbaazi.bootstrap.models.Data
+import com.sportsbaazi.bootstrap.models.Players
 import com.sportsbaazi.bootstrap.ui.sportsbaazi_ui.ArticleListUiState
 import com.sportsbaazi.bootstrap.ui.other.Business
 import com.sportsbaazi.bootstrap.ui.other.Category
@@ -17,6 +20,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 import javax.inject.Inject
 
 
@@ -44,8 +48,14 @@ class NewsViewModel @Inject constructor(private val repo: NewsRepository) : View
     }
     val activeCategoryUiState: LiveData<ArticleListUiState> = _activeCategoryUiState
 
+    lateinit var playersList: List<Data>
     init {
         getArticlesByCategory(categoryList.value!![0])
+
+    }
+
+    fun customInit(fileInString: String) {
+        setPlayersData(fileInString)
     }
 
     private fun getArticlesByCategory(
@@ -76,6 +86,13 @@ class NewsViewModel @Inject constructor(private val repo: NewsRepository) : View
     fun downloadApkFile() {
         _downloadApk.value = true
     }
+
+    private fun setPlayersData(fileInString: String) {
+        val gson = Gson()
+        val players : Players = gson.fromJson(fileInString, Players::class.java)
+        playersList = players.data
+    }
+
     fun performAction(action: Action) {
         when (action) {
             is Action.ChangePageTo -> {

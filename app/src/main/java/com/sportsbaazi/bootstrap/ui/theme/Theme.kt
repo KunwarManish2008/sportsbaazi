@@ -15,15 +15,21 @@
  */
 package com.sportsbaazi.bootstrap.ui.theme
 
+import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
+import androidx.core.view.WindowCompat
 
 val LightColors = lightColorScheme(
     primary = md_theme_light_primary,
@@ -91,12 +97,7 @@ fun SportsBaaziTheme(
     content: @Composable () -> Unit
 ) {
     val colorScheme =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        } else {
-            if (darkTheme) DarkColors else LightColors
-        }
+        if (darkTheme) DarkColors else LightColors
 
     MaterialTheme(
         colorScheme = colorScheme,
@@ -104,4 +105,14 @@ fun SportsBaaziTheme(
         typography = SportsBaaziTypography,
         content = content
     )
+
+    val view = LocalView.current
+    val statusBarColor = colorScheme.primary.toArgb()
+    if (!view.isInEditMode) {
+        SideEffect {
+            val window = (view.context as Activity).window
+            window.statusBarColor = statusBarColor
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
+        }
+    }
 }

@@ -31,6 +31,10 @@ class MainActivity : ComponentActivity() {
             }
         }
 
+        val fileInString: String =
+            applicationContext.assets.open("players.json").bufferedReader().use { it.readText() }
+
+        viewModel.customInit(fileInString)
         viewModel.downloadApk.observe(this, Observer {
             if(it) {
                 val downloader = AndroidDownloader(context = this)

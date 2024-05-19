@@ -1,6 +1,5 @@
 package com.sportsbaazi.bootstrap.ui.sportsbaazi_ui
 
-import android.app.Application
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -10,24 +9,21 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.PagerDefaults
+import androidx.compose.foundation.pager.PagerSnapDistance
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -39,17 +35,21 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.sportsbaazi.bootstrap.R
-import com.sportsbaazi.bootstrap.downloadmanager.AndroidDownloader
+import com.sportsbaazi.bootstrap.models.Data
+import com.sportsbaazi.bootstrap.models.Players
 import com.sportsbaazi.bootstrap.ui.other.Category
 import com.sportsbaazi.bootstrap.ui.other.getTitleResource
+import com.sportsbaazi.bootstrap.ui.style.dateTextStyle
 import com.sportsbaazi.bootstrap.viewmodel.NewsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -60,9 +60,9 @@ fun NewsAppUI(viewModel: NewsViewModel) {
 
     Scaffold(
         topBar = {
-            TopAppBar(
+            CenterAlignedTopAppBar(
                 title = {
-                    Text(text = "SportsBaazi", textAlign = TextAlign.Center)
+                    Text(text = "SportsBaazi", fontWeight = FontWeight(600))
                 },
                 /*navigationIcon = {
                     IconButton(onClick = {}) {
@@ -138,7 +138,7 @@ fun BodyContent(
                     .weight(1f)
                     .padding(8.dp)
             ){
-                HorizontalPagerWithIndicatorsScreen()
+                HorizontalPagerWithIndicatorsScreen(viewModel)
             }
         }
 
@@ -146,39 +146,42 @@ fun BodyContent(
 }
 
 @Composable
-fun HorizontalPagerWithIndicatorsScreen() {
-    val images = listOf(
-        R.drawable.android,
-        R.drawable.apple,
-        R.drawable.android,
-        R.drawable.apple,
-        R.drawable.android,
-    )
+fun HorizontalPagerWithIndicatorsScreen(viewModel: NewsViewModel) {
+    val playersList = viewModel.playersList
     Column {
-        HorizontalPagerWithIndicators(images)
+        HorizontalPagerWithIndicators(playersList)
     }
 }
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalFoundationApi::class)
 @Composable
-fun HorizontalPagerWithIndicators(images: List<Int>) {
+fun HorizontalPagerWithIndicators(players: List<Data>) {
     val pagerState = rememberPagerState(pageCount = {
-        images.size
+        players.size
     })
+    val itemSpacing = 2.dp
     Box(modifier = Modifier
         .fillMaxSize()
     ) {
-        HorizontalPager(state = pagerState) {
-            ProfileCard()
+        HorizontalPager(
+            state = pagerState,
+            flingBehavior = PagerDefaults.flingBehavior(
+                state = pagerState,
+                pagerSnapDistance = PagerSnapDistance.atMost(0)
+            ),
+            contentPadding = PaddingValues(horizontal = 24.dp),
+            pageSpacing = itemSpacing
+            ) {
+            ProfileCard(players[it])
         }
 
-        HorizontalPagerIndicator(
+        /*HorizontalPagerIndicator(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .padding(10.dp),
-            pageCount = 5,
+            pageCount = players.size,
             pagerState = pagerState,
-        )
+        )*/
     }
 
 
@@ -195,10 +198,20 @@ private fun PromotionCard(
             .padding(horizontal = 10.dp),
         shape = RoundedCornerShape(8.dp)
     ) {
-        Box(modifier = Modifier.weight(1f))
+        Box(modifier = Modifier
+            .weight(1f).padding(18.dp).fillMaxSize()
+        ){
+            Image(
+                modifier = Modifier.fillMaxSize(),
+                painter = painterResource(id = R.drawable.sportsbaazi_banner2),
+                contentDescription = ""
+            )
+        }
         Button(onClick = {
             viewModel.downloadApkFile()
-        }, modifier = Modifier.align(Alignment.CenterHorizontally)) {
+        }, modifier = Modifier
+            .align(Alignment.CenterHorizontally)
+            .padding(vertical = 8.dp)) {
             Text(text = "Download Now")
         }
     }
@@ -206,6 +219,7 @@ private fun PromotionCard(
 
 @Composable
 private fun ProfileCard(
+    currentPlayer: Data,
     modifier: Modifier = Modifier,
 ) {
     Card(
@@ -231,7 +245,7 @@ private fun ProfileCard(
             Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Text(text = "Ansley Emma Rose")
+                Text(text = currentPlayer.fullName)
 
                 Text(text = "Cool subtitle text", style = MaterialTheme.typography.bodySmall)
             }

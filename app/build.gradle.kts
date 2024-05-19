@@ -94,6 +94,6 @@ dependencies {
     ksp("com.google.dagger:hilt-android-compiler:2.48")
 
     implementation("com.google.accompanist:accompanist-pager-indicators:0.30.1")
-
+    implementation("com.google.code.gson:gson:2.10.1")
 
 }
