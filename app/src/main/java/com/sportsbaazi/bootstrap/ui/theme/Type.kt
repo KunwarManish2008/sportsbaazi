@@ -1,96 +1,145 @@
 package com.sportsbaazi.bootstrap.ui.theme
 
-
 import androidx.compose.material3.Typography
-import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.LineBreak
-import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.sp
 import com.sportsbaazi.bootstrap.R
 
-
-private val montserrat = FontFamily(
-    Font(R.font.montserrat_regular),
-    Font(R.font.montserrat_medium, FontWeight.W500)
-)
-
-@Suppress("DEPRECATION")
-val defaultTextStyle = TextStyle(
-    fontFamily = montserrat,
-    platformStyle = PlatformTextStyle(
-        includeFontPadding = false
-    ),
-    lineHeightStyle = LineHeightStyle(
-        alignment = LineHeightStyle.Alignment.Center,
-        trim = LineHeightStyle.Trim.None
+val Inter = FontFamily(
+    listOf(
+        Font(resId = R.font.inter_medium, weight = FontWeight.Medium)
     )
 )
 
-val SportsBaaziTypography = Typography(
-    displayLarge = defaultTextStyle.copy(
-        fontSize = 57.sp, lineHeight = 64.sp, letterSpacing = (-0.25).sp
+val Rubik = FontFamily(
+    listOf(
+        Font(resId = R.font.rubik_bold, weight = FontWeight.Bold)
+    )
+)
+
+val Roboto = FontFamily(
+    listOf(
+        Font(resId = R.font.roboto_medium, weight = FontWeight.Medium),
+        Font(resId = R.font.roboto_regular, weight = FontWeight.Normal),
+        Font(resId = R.font.roboto_bold, weight = FontWeight.ExtraBold),
+    )
+)
+
+// Set of Material typography styles to start with
+val CompactTypography = Typography(
+    headlineLarge = TextStyle(
+        fontFamily = Roboto,
+        fontWeight = FontWeight.ExtraBold,
+        fontSize = 32.sp
     ),
-    displayMedium = defaultTextStyle.copy(
-        fontSize = 45.sp, lineHeight = 52.sp, letterSpacing = 0.sp
+    headlineMedium = TextStyle(
+        fontFamily = Rubik,
+        fontWeight = FontWeight.Bold,
+        fontSize = 24.sp
     ),
-    displaySmall = defaultTextStyle.copy(
-        fontSize = 36.sp, lineHeight = 44.sp, letterSpacing = 0.sp
-    ),
-    headlineLarge = defaultTextStyle.copy(
-        fontSize = 32.sp, lineHeight = 40.sp, letterSpacing = 0.sp, lineBreak = LineBreak.Heading
-    ),
-    headlineMedium = defaultTextStyle.copy(
-        fontSize = 28.sp, lineHeight = 36.sp, letterSpacing = 0.sp, lineBreak = LineBreak.Heading
-    ),
-    headlineSmall = defaultTextStyle.copy(
-        fontSize = 24.sp, lineHeight = 32.sp, letterSpacing = 0.sp, lineBreak = LineBreak.Heading
-    ),
-    titleLarge = defaultTextStyle.copy(
-        fontSize = 22.sp, lineHeight = 28.sp, letterSpacing = 0.sp, lineBreak = LineBreak.Heading
-    ),
-    titleMedium = defaultTextStyle.copy(
-        fontSize = 16.sp,
-        lineHeight = 24.sp,
-        letterSpacing = 0.15.sp,
+    titleMedium = TextStyle(
+        fontFamily = Inter,
         fontWeight = FontWeight.Medium,
-        lineBreak = LineBreak.Heading
+        fontSize = 14.sp
     ),
-    titleSmall = defaultTextStyle.copy(
-        fontSize = 14.sp,
-        lineHeight = 20.sp,
-        letterSpacing = 0.1.sp,
+    labelMedium = TextStyle(
+        fontFamily = Roboto,
+        fontWeight = FontWeight.Normal,
+        fontSize = 14.sp
+    )
+)
+
+val CompactMediumTypography = Typography(
+    headlineLarge = TextStyle(
+        fontFamily = Roboto,
+        fontWeight = FontWeight.ExtraBold,
+        fontSize = 28.sp
+    ),
+    headlineMedium = TextStyle(
+        fontFamily = Rubik,
+        fontWeight = FontWeight.Bold,
+        fontSize = 22.sp
+    ),
+    titleMedium = TextStyle(
+        fontFamily = Inter,
         fontWeight = FontWeight.Medium,
-        lineBreak = LineBreak.Heading
+        fontSize = 14.sp
     ),
-    labelLarge = defaultTextStyle.copy(
-        fontSize = 14.sp, lineHeight = 20.sp, letterSpacing = 0.1.sp, fontWeight = FontWeight.Medium
+    labelMedium = TextStyle(
+        fontFamily = Roboto,
+        fontWeight = FontWeight.Normal,
+        fontSize = 14.sp
+    )
+)
+
+val CompactSmallTypography = Typography(
+    headlineLarge = TextStyle(
+        fontFamily = Roboto,
+        fontWeight = FontWeight.ExtraBold,
+        fontSize = 22.sp
     ),
-    labelMedium = defaultTextStyle.copy(
-        fontSize = 12.sp, lineHeight = 16.sp, letterSpacing = 0.5.sp, fontWeight = FontWeight.Medium
+    headlineMedium = TextStyle(
+        fontFamily = Rubik,
+        fontWeight = FontWeight.Bold,
+        fontSize = 16.sp
     ),
-    labelSmall = defaultTextStyle.copy(
-        fontSize = 11.sp, lineHeight = 16.sp, letterSpacing = 0.5.sp, fontWeight = FontWeight.Medium
+    titleMedium = TextStyle(
+        fontFamily = Inter,
+        fontWeight = FontWeight.Medium,
+        fontSize = 10.sp
     ),
-    bodyLarge = defaultTextStyle.copy(
-        fontSize = 16.sp,
-        lineHeight = 24.sp,
-        letterSpacing = 0.5.sp,
-        lineBreak = LineBreak.Paragraph
+    labelMedium = TextStyle(
+        fontFamily = Roboto,
+        fontWeight = FontWeight.Normal,
+        fontSize = 10.sp
+    )
+)
+
+val MediumTypography = Typography(
+    headlineLarge = TextStyle(
+        fontFamily = Roboto,
+        fontWeight = FontWeight.ExtraBold,
+        fontSize = 38.sp
     ),
-    bodyMedium = defaultTextStyle.copy(
-        fontSize = 14.sp,
-        lineHeight = 20.sp,
-        letterSpacing = 0.25.sp,
-        lineBreak = LineBreak.Paragraph
+    headlineMedium = TextStyle(
+        fontFamily = Rubik,
+        fontWeight = FontWeight.Bold,
+        fontSize = 30.sp
     ),
-    bodySmall = defaultTextStyle.copy(
-        fontSize = 12.sp,
-        lineHeight = 16.sp,
-        letterSpacing = 0.4.sp,
-        lineBreak = LineBreak.Paragraph
+    titleMedium = TextStyle(
+        fontFamily = Inter,
+        fontWeight = FontWeight.Medium,
+        fontSize = 16.sp
     ),
+    labelMedium = TextStyle(
+        fontFamily = Roboto,
+        fontWeight = FontWeight.Normal,
+        fontSize = 16.sp
+    )
+)
+
+val ExpandedTypography = Typography(
+    headlineLarge = TextStyle(
+        fontFamily = Roboto,
+        fontWeight = FontWeight.ExtraBold,
+        fontSize = 42.sp
+    ),
+    headlineMedium = TextStyle(
+        fontFamily = Rubik,
+        fontWeight = FontWeight.Bold,
+        fontSize = 34.sp
+    ),
+    titleMedium = TextStyle(
+        fontFamily = Inter,
+        fontWeight = FontWeight.Medium,
+        fontSize = 18.sp
+    ),
+    labelMedium = TextStyle(
+        fontFamily = Roboto,
+        fontWeight = FontWeight.Normal,
+        fontSize = 18.sp
+    )
 )

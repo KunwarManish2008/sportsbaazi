@@ -9,8 +9,24 @@ import com.sportsbaazi.bootstrap.data.Result
 import com.sportsbaazi.bootstrap.data.repository.NewsRepository
 import com.sportsbaazi.bootstrap.data.response.NewsResponse
 import com.sportsbaazi.bootstrap.downloadmanager.AndroidDownloader
+import com.sportsbaazi.bootstrap.models.Blog
 import com.sportsbaazi.bootstrap.models.Data
 import com.sportsbaazi.bootstrap.models.Players
+import com.sportsbaazi.bootstrap.staticdata.canShivamDubeyContent
+import com.sportsbaazi.bootstrap.staticdata.canShivamDubeyContentSummary
+import com.sportsbaazi.bootstrap.staticdata.canShivamDubeyImage
+import com.sportsbaazi.bootstrap.staticdata.fiveTeamContentSummary
+import com.sportsbaazi.bootstrap.staticdata.fiveTeamsContent
+import com.sportsbaazi.bootstrap.staticdata.fiveTeamsImage
+import com.sportsbaazi.bootstrap.staticdata.indiaWinContent
+import com.sportsbaazi.bootstrap.staticdata.indiaWinContentSummary
+import com.sportsbaazi.bootstrap.staticdata.indiaWinImage
+import com.sportsbaazi.bootstrap.staticdata.recordsMadeContent
+import com.sportsbaazi.bootstrap.staticdata.recordsMadeContentSummary
+import com.sportsbaazi.bootstrap.staticdata.recordsMadeImage
+import com.sportsbaazi.bootstrap.staticdata.tenBestRecordContent
+import com.sportsbaazi.bootstrap.staticdata.tenBestRecordContentSummary
+import com.sportsbaazi.bootstrap.staticdata.tenBestRecordPoster
 import com.sportsbaazi.bootstrap.ui.sportsbaazi_ui.ArticleListUiState
 import com.sportsbaazi.bootstrap.ui.other.Business
 import com.sportsbaazi.bootstrap.ui.other.Category
@@ -49,6 +65,7 @@ class NewsViewModel @Inject constructor(private val repo: NewsRepository) : View
     val activeCategoryUiState: LiveData<ArticleListUiState> = _activeCategoryUiState
 
     lateinit var playersList: List<Data>
+    lateinit var blogList: List<Blog>
     init {
         getArticlesByCategory(categoryList.value!![0])
 
@@ -56,8 +73,18 @@ class NewsViewModel @Inject constructor(private val repo: NewsRepository) : View
 
     fun customInit(fileInString: String) {
         setPlayersData(fileInString)
+        prepareBlogData()
     }
 
+    private fun prepareBlogData() {
+        blogList = listOf(
+            Blog(blogContent = fiveTeamsContent, blogImage = fiveTeamsImage, blogContentSummary = fiveTeamContentSummary),
+            Blog(blogContent = canShivamDubeyContent, blogImage = canShivamDubeyImage, blogContentSummary = canShivamDubeyContentSummary),
+            Blog(blogContent = indiaWinContent, blogImage = indiaWinImage, blogContentSummary = indiaWinContentSummary),
+            Blog(blogContent = tenBestRecordContent, blogImage = tenBestRecordPoster, blogContentSummary = tenBestRecordContentSummary),
+            Blog(blogContent = recordsMadeContent, blogImage = recordsMadeImage, blogContentSummary = recordsMadeContentSummary)
+        )
+    }
     private fun getArticlesByCategory(
         category: Category,
         page: Int = 1

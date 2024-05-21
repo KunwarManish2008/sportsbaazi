@@ -11,7 +11,6 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.ui.platform.LocalContext
 import com.sportsbaazi.bootstrap.ui.theme.SportsBaaziShapes
-import com.sportsbaazi.bootstrap.ui.theme.SportsBaaziTypography
 import com.sportsbaazi.bootstrap.ui.theme.md_theme_dark_background
 import com.sportsbaazi.bootstrap.ui.theme.md_theme_dark_error
 import com.sportsbaazi.bootstrap.ui.theme.md_theme_dark_errorContainer
@@ -143,7 +142,6 @@ fun SportsBaaziTheme(
     MaterialTheme(
         colorScheme = colorScheme,
         shapes = SportsBaaziShapes,
-        typography = SportsBaaziTypography,
         content = content
     )
 }

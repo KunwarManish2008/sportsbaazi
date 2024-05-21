@@ -24,12 +24,22 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
+import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
+import com.sportsbaazi.bootstrap.MainActivity
+import com.sportsbaazi.bootstrap.utils.CompactDimens
+import com.sportsbaazi.bootstrap.utils.CompactMediumDimens
+import com.sportsbaazi.bootstrap.utils.CompactSmallDimens
+import com.sportsbaazi.bootstrap.utils.ExpandedDimens
+import com.sportsbaazi.bootstrap.utils.MediumDimens
 
 val LightColors = lightColorScheme(
     primary = md_theme_light_primary,
@@ -91,28 +101,70 @@ val DarkColors = darkColorScheme(
     surfaceTint = md_theme_dark_surfaceTint,
 )
 
+@OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
 fun SportsBaaziTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
+    activity: Activity = LocalContext.current as MainActivity,
     content: @Composable () -> Unit
 ) {
     val colorScheme =
-        if (darkTheme) DarkColors else LightColors
-
-    MaterialTheme(
-        colorScheme = colorScheme,
-        shapes = SportsBaaziShapes,
-        typography = SportsBaaziTypography,
-        content = content
-    )
+        if (darkTheme) LightColors else LightColors
 
     val view = LocalView.current
-    val statusBarColor = colorScheme.primary.toArgb()
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            window.statusBarColor = statusBarColor
+            window.statusBarColor = colorScheme.primary.toArgb()
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
         }
     }
+    val window = calculateWindowSizeClass(activity = activity)
+    val config = LocalConfiguration.current
+
+    var typography = CompactTypography
+    var appDimens = CompactDimens
+
+    when (window.widthSizeClass) {
+        WindowWidthSizeClass.Compact -> {
+            if (config.screenWidthDp <= 360) {
+                appDimens = CompactSmallDimens
+                typography = CompactSmallTypography
+            } else if (config.screenWidthDp < 599) {
+                appDimens = CompactMediumDimens
+                typography = CompactMediumTypography
+            } else {
+                appDimens = CompactDimens
+                typography = CompactTypography
+            }
+        }
+
+        WindowWidthSizeClass.Medium -> {
+            appDimens = MediumDimens
+            typography = CompactTypography
+        }
+
+        WindowWidthSizeClass.Expanded -> {
+            appDimens = ExpandedDimens
+            typography = ExpandedTypography
+        }
+
+        else -> {
+            appDimens = ExpandedDimens
+            typography = ExpandedTypography
+        }
+    }
+
+    ProvideAppUtils(appDimens = appDimens) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = typography,
+            content = content
+        )
+    }
+
 }
+
+val MaterialTheme.dimens
+    @Composable
+    get() = LocalAppDimens.current

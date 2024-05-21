@@ -2,6 +2,8 @@ package com.sportsbaazi.bootstrap
 
 import android.app.Application
 import android.os.Bundle
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -10,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Observer
 import com.sportsbaazi.bootstrap.downloadmanager.AndroidDownloader
 import com.sportsbaazi.bootstrap.ui.sportsbaazi_ui.NewsAppUI
@@ -38,7 +41,7 @@ class MainActivity : ComponentActivity() {
         viewModel.downloadApk.observe(this, Observer {
             if(it) {
                 val downloader = AndroidDownloader(context = this)
-                downloader.downloadFile("https://d.cdnpure.com/b/APK/com.fantasycricketapp.ballebaazi?version=latest")
+                downloader.downloadFile("https://link.sportsbaazi.com/G2OuU1JYQJb")
             }
         })
         /*setContent {

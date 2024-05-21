@@ -96,4 +96,7 @@ dependencies {
     implementation("com.google.accompanist:accompanist-pager-indicators:0.30.1")
     implementation("com.google.code.gson:gson:2.10.1")
 
+    //WindowSizeClass
+    implementation("androidx.compose.material3:material3-window-size-class:1.2.1")
+
 }

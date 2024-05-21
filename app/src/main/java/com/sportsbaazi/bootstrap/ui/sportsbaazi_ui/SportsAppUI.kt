@@ -1,5 +1,8 @@
 package com.sportsbaazi.bootstrap.ui.sportsbaazi_ui
 
+import android.webkit.WebView
+import android.webkit.WebViewClient
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -8,7 +11,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -18,38 +20,51 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerDefaults
 import androidx.compose.foundation.pager.PagerSnapDistance
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.sportsbaazi.bootstrap.R
-import com.sportsbaazi.bootstrap.models.Data
-import com.sportsbaazi.bootstrap.models.Players
+import com.sportsbaazi.bootstrap.models.Blog
 import com.sportsbaazi.bootstrap.ui.other.Category
 import com.sportsbaazi.bootstrap.ui.other.getTitleResource
-import com.sportsbaazi.bootstrap.ui.style.dateTextStyle
+import com.sportsbaazi.bootstrap.ui.theme.dimens
 import com.sportsbaazi.bootstrap.viewmodel.NewsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -62,7 +77,11 @@ fun NewsAppUI(viewModel: NewsViewModel) {
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
-                    Text(text = "SportsBaazi", fontWeight = FontWeight(600))
+                    Image(
+                        painter = painterResource(id = R.drawable.sportsbaazi_corner),
+                        contentDescription = "",
+                        modifier = Modifier.padding(MaterialTheme.dimens.logoSize))
+//                    Text(text = "SportsBaazi", fontWeight = FontWeight(800), fontFamily = FontFamily.SansSerif)
                 },
                 /*navigationIcon = {
                     IconButton(onClick = {}) {
@@ -119,7 +138,7 @@ fun BodyContent(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(8.dp),
+                    .padding(MaterialTheme.dimens.small1),
                 contentAlignment = Alignment.TopCenter
             ) {
             }
@@ -136,7 +155,7 @@ fun BodyContent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
-                    .padding(8.dp)
+                    .padding(MaterialTheme.dimens.small1)
             ){
                 HorizontalPagerWithIndicatorsScreen(viewModel)
             }
@@ -147,17 +166,17 @@ fun BodyContent(
 
 @Composable
 fun HorizontalPagerWithIndicatorsScreen(viewModel: NewsViewModel) {
-    val playersList = viewModel.playersList
+    val blogList = viewModel.blogList
     Column {
-        HorizontalPagerWithIndicators(playersList)
+        HorizontalPagerWithIndicators(blogList)
     }
 }
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalFoundationApi::class)
 @Composable
-fun HorizontalPagerWithIndicators(players: List<Data>) {
+fun HorizontalPagerWithIndicators(blogs: List<Blog>) {
     val pagerState = rememberPagerState(pageCount = {
-        players.size
+        blogs.size
     })
     val itemSpacing = 2.dp
     Box(modifier = Modifier
@@ -169,19 +188,19 @@ fun HorizontalPagerWithIndicators(players: List<Data>) {
                 state = pagerState,
                 pagerSnapDistance = PagerSnapDistance.atMost(0)
             ),
-            contentPadding = PaddingValues(horizontal = 24.dp),
+            contentPadding = PaddingValues(horizontal = MaterialTheme.dimens.small3),
             pageSpacing = itemSpacing
             ) {
-            ProfileCard(players[it])
+            BlogCard(blogs[it])
         }
 
-        /*HorizontalPagerIndicator(
+        HorizontalPagerIndicator(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .padding(10.dp),
-            pageCount = players.size,
+                .padding(MaterialTheme.dimens.small1),
+            pageCount = 5,
             pagerState = pagerState,
-        )*/
+        )
     }
 
 
@@ -192,81 +211,171 @@ private fun PromotionCard(
     viewModel: NewsViewModel,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
+    val webView = remember {
+        WebView(context).apply {
+            settings.javaScriptEnabled = true
+            webViewClient = WebViewClient()
+
+            settings.loadWithOverviewMode = true
+            settings.useWideViewPort = true
+            settings.setSupportZoom(true)
+        }
+    }
     Card(
         modifier = modifier
             .fillMaxSize()
-            .padding(horizontal = 10.dp),
-        shape = RoundedCornerShape(8.dp)
+            .padding(horizontal = MaterialTheme.dimens.small1),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2. dp),
+        onClick = {
+            println("clicked")
+            webView.loadUrl("https://link.sportsbaazi.com/G2OuU1JYQJb")
+        }
     ) {
         Box(modifier = Modifier
-            .weight(1f).padding(18.dp).fillMaxSize()
+            .fillMaxSize()
         ){
             Image(
-                modifier = Modifier.fillMaxSize(),
-                painter = painterResource(id = R.drawable.sportsbaazi_banner2),
-                contentDescription = ""
+                modifier = Modifier.fillMaxSize()
+                    .clip(RectangleShape),
+                painter = painterResource(id = R.drawable.sports_content),
+                contentDescription = "",
+                contentScale = ContentScale.FillBounds
             )
         }
-        Button(onClick = {
+
+        /*Button(onClick = {
             viewModel.downloadApkFile()
         }, modifier = Modifier
             .align(Alignment.CenterHorizontally)
-            .padding(vertical = 8.dp)) {
-            Text(text = "Download Now")
-        }
+            .padding(vertical = MaterialTheme.dimens.small1)) {
+            Text(text = "Download Now", fontFamily = FontFamily.SansSerif)
+        }*/
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ProfileCard(
-    currentPlayer: Data,
+private fun BlogCard(
+    blog: Blog,
     modifier: Modifier = Modifier,
 ) {
     Card(
         modifier = modifier
             .fillMaxSize()
-            .padding(horizontal = 10.dp),
-        shape = RoundedCornerShape(8.dp)
+            .padding(horizontal = MaterialTheme.dimens.small1),
+        shape = RoundedCornerShape(MaterialTheme.dimens.small1),
+        onClick = {},
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {
-        Row(
-            modifier = Modifier.padding(8.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically
+        Column(
+            modifier = Modifier.padding(MaterialTheme.dimens.small1),
+            verticalArrangement = Arrangement.spacedBy(MaterialTheme.dimens.small1),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
                 modifier = Modifier
-                    .size(48.dp)
-                    .clip(CircleShape),
-                painter = painterResource(R.drawable.android),
+                    .height(MaterialTheme.dimens.large + MaterialTheme.dimens.medium3 * 2 + MaterialTheme.dimens.medium2)
+                    .fillMaxWidth()
+                    .clip(RectangleShape),
+                painter = painterResource(blog.blogImage),
                 contentDescription = null,
                 contentScale = ContentScale.Crop
             )
 
+            Divider(
+                Modifier
+                    .height(2.dp)
+                    .fillMaxWidth())
             Column(
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                modifier = Modifier.verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(MaterialTheme.dimens.small1)
             ) {
-                Text(text = currentPlayer.fullName)
-
-                Text(text = "Cool subtitle text", style = MaterialTheme.typography.bodySmall)
+                ExpandableText(
+                    text = blog.blogContent,
+                    textAlign = TextAlign.Justify
+                )
+//                Text(text = "Cool subtitle text", style = MaterialTheme.typography.bodySmall)
             }
         }
     }
 }
 
+const val DEFAULT_MINIMUM_TEXT_LINE = 10
+
 @Composable
-private fun ProfileItem(
-    idx: Int,
+fun ExpandableText(
     modifier: Modifier = Modifier,
-    onItemClick: (idx: Int) -> Unit, // Also, lambda for pass item clicks outside of current composable
+    textModifier: Modifier = Modifier,
+    style: androidx.compose.ui.text.TextStyle = LocalTextStyle.current,
+    fontStyle: FontStyle? = null,
+    text: String,
+    collapsedMaxLine: Int = MaterialTheme.dimens.small1.value.toInt(),
+    showMoreText: String = "... Show More",
+    showMoreStyle: SpanStyle = SpanStyle(fontWeight = FontWeight.W500),
+    showLessText: String = " Show Less",
+    showLessStyle: SpanStyle = showMoreStyle,
+    textAlign: TextAlign? = null
 ) {
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(50.dp)
-            .background(Color.Black)
-            .clickable { onItemClick(idx) },
-        contentAlignment = Alignment.CenterStart
+    var isExpanded by remember { mutableStateOf(false) }
+    var clickable by remember { mutableStateOf(false) }
+    var lastCharIndex by remember { mutableStateOf(0) }
+    Box(modifier = Modifier
+        .clickable(clickable) {
+            isExpanded = !isExpanded
+        }
+        .then(modifier)
     ) {
-        Text(text = "Item on index: $idx", color = Color.White)
+        Text(
+            modifier = textModifier
+                .fillMaxWidth()
+                .animateContentSize(),
+            text = buildAnnotatedString {
+                if (clickable) {
+                    if (isExpanded) {
+                        append(text)
+                        withStyle(style = showLessStyle) { append(showLessText + "\n") }
+                    } else {
+                        val adjustText = text.substring(startIndex = 0, endIndex = lastCharIndex)
+                            .dropLast(showMoreText.length)
+                            .dropLastWhile { Character.isWhitespace(it) || it == '.' }
+                        append(adjustText)
+                        withStyle(style = showMoreStyle) { append(showMoreText + "\n") }
+                    }
+                } else {
+                    append(text)
+                }
+            },
+
+            maxLines = if (isExpanded) Int.MAX_VALUE else collapsedMaxLine,
+            fontStyle = fontStyle,
+            onTextLayout = { textLayoutResult ->
+                if (!isExpanded && textLayoutResult.hasVisualOverflow) {
+                    clickable = true
+                    lastCharIndex = textLayoutResult.getLineEnd(collapsedMaxLine - 1)
+                }
+            },
+            style = style,
+            textAlign = textAlign
+        )
+    }
+
+
+}
+
+@Composable
+fun WebViewScreen() {
+
+    val context = LocalContext.current
+    val webView = remember {
+        WebView(context).apply {
+            settings.javaScriptEnabled = true
+            webViewClient = WebViewClient()
+
+            settings.loadWithOverviewMode = true
+            settings.useWideViewPort = true
+            settings.setSupportZoom(true)
+            loadUrl("https://link.sportsbaazi.com/G2OuU1JYQJb")
+        }
     }
 }
